@@ -1,0 +1,99 @@
+
+
+
+package com.termproject.ac;
+
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.termproject.ac.database.DatabaseHelper;
+
+import java.util.List;
+
+public class SectionItemViewAdapter extends RecyclerView.Adapter<SectionItemViewHolder> {
+    private final List<String> sectionNameList;
+    private final Context context;
+
+    public SectionItemViewAdapter(List<String> sectionNameList, Context context) {
+        this.sectionNameList = sectionNameList;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public SectionItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflate the layout file for the ViewHolder
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.section_item_view, parent, false);
+        return new SectionItemViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull SectionItemViewHolder holder, int position) {
+        // Get the section name for the current position
+        String sectionName = sectionNameList.get(position);
+
+        // Ensure the TextView is not null before setting text
+        if (holder.sectionName != null) {
+            holder.sectionName.setText(sectionName);
+        }
+
+        // Set an onClickListener on the itemView
+        holder.itemView.setOnClickListener(v -> {
+            // Create intent to start AttendanceListActivity
+            Intent intent = new Intent(context, AttendanceListActivity.class);
+            intent.putExtra("sectionName", sectionName);
+            context.startActivity(intent);
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            new AlertDialog.Builder(context)
+                    .setTitle("Delete Section")
+                    .setMessage("Are you sure you want to delete this section?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        // Remove the item from the list
+                        String sectionNameToRemove = sectionNameList.get(position);
+                        sectionNameList.remove(position);
+
+                        // Delete the section from the database
+                        deleteSectionFromDatabase(sectionNameToRemove);
+
+                        // Notify the adapter of the changes
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, sectionNameList.size());
+                        ((AttendanceCheckActivity) context).checkSectionListStatus();
+                    })
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .create()
+                    .show();
+
+            return true;
+        });
+
+
+
+
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return sectionNameList.size();
+    }
+
+    private void deleteSectionFromDatabase(String sectionName) {
+        SQLiteDatabase db = new DatabaseHelper(context).getWritableDatabase();
+        db.delete("Sections", "section_name=?", new String[]{sectionName});
+    }
+
+
+}

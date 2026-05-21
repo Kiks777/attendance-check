@@ -1,0 +1,24 @@
+
+package com.termproject.ac;
+
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
+public class ItemTableRowViewHolder extends RecyclerView.ViewHolder {
+    TextView id;
+    TextView statusIn;
+    TextView currentTimeIn;
+    TextView statusOut;
+    TextView currentTimeOut;
+
+    public ItemTableRowViewHolder(View itemView) {
+        super(itemView);
+        id = itemView.findViewById(R.id.student_IDNumber);
+        statusIn = itemView.findViewById(R.id.status_in);
+        currentTimeIn = itemView.findViewById(R.id.current_time_in);
+        statusOut = itemView.findViewById(R.id.status_out);
+        currentTimeOut = itemView.findViewById(R.id.current_time_out);
+    }
+}

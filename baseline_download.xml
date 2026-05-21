@@ -1,0 +1,107 @@
+package com.termproject.ac;
+
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.termproject.ac.database.DatabaseHelper;
+
+import java.util.List;
+
+public class EventsListAdapter extends RecyclerView.Adapter<EventsListViewHolder> {
+    private final List<String> eventNameList;
+    private final Context context;
+
+    public EventsListAdapter(List<String> eventNameList, Context context) {
+        this.eventNameList = eventNameList;
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    public EventsListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflate the layout file for the ViewHolder
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item_view, parent, false);
+        return new EventsListViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull EventsListViewHolder holder, int position) {
+        // Get the event name for the current position
+        String eventName = eventNameList.get(position);
+
+        // Ensure the TextView is not null before setting text
+        if (holder.eventName != null) {
+            holder.eventName.setText(eventName);
+        }
+
+        // Set an onClickListener on the itemView
+        holder.itemView.setOnClickListener(v -> {
+            // Retrieve event ID from the database
+            int eventId = getEventId(eventName);
+
+            // Create intent to start AttendanceCheckActivity and pass the event ID and name
+            Intent intent = new Intent(context, AttendanceCheckActivity.class);
+            intent.putExtra("eventId", eventId);
+            intent.putExtra("eventName", eventName);
+            context.startActivity(intent);
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            new AlertDialog.Builder(context)
+                    .setTitle("Delete Event")
+                    .setMessage("Are you sure you want to delete this event?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        // Remove the item from the list
+                        String eventNameToRemove = eventNameList.get(position);
+                        eventNameList.remove(position);
+
+                        // Delete the event from the database
+                        deleteEventFromDatabase(eventNameToRemove);
+
+                        // Notify the adapter of the changes
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, eventNameList.size());
+                        ((EventsListActivity) context).checkEventListStatus();
+                    })
+                    .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                    .create()
+                    .show();
+
+            return true;
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return eventNameList.size();
+    }
+
+    private int getEventId(String eventName) {
+        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query("Events", new String[]{"event_id"}, "event_name=?", new String[]{eventName}, null, null, null);
+
+        int eventId = -1;
+        if (cursor.moveToFirst()) {
+            eventId = cursor.getInt(cursor.getColumnIndexOrThrow("event_id"));
+        }
+        cursor.close();
+        return eventId;
+    }
+
+    private void deleteEventFromDatabase(String eventName) {
+        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        db.delete("Events", "event_name=?", new String[]{eventName});
+    }
+}

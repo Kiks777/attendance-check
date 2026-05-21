@@ -1,0 +1,166 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="HardcodedText">
+
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/skyblue">
+
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="30dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/arrow_back"
+            app:tint="@color/white" />
+
+        <TextView
+            android:id="@+id/attendance_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="25dp"
+            android:text="Attendance Check"
+            android:textColor="@color/white"
+            android:textSize="25sp"
+
+             />
+
+
+        <ImageView
+            android:id="@+id/export"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="40dp"
+            android:layout_toEndOf="@+id/attendance_check"
+            android:importantForAccessibility="no"
+            android:src="@drawable/export_icon"
+            app:tint="@color/white" />
+
+    </RelativeLayout>
+
+
+
+
+
+    <!-- Table Headers -->
+    <LinearLayout
+        android:id="@+id/title_headings"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal"
+        android:layout_below="@+id/header"
+        android:padding="8dp"
+        android:background="@color/skyblue"
+
+        >
+
+
+
+        <TextView
+            android:id="@+id/titleID"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:text="ID Number"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+
+        />
+
+
+        <RadioGroup
+            android:id="@+id/activity_selection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+
+            >
+
+            <RadioButton
+                android:id="@+id/set_time_in"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:text="In"
+                android:layout_marginEnd="60dp"
+                android:textStyle="bold"
+                android:buttonTint="@color/white"/>
+
+            <RadioButton
+                android:id="@+id/set_time_out"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textColor="@color/white"
+                android:text="Out"
+                android:layout_marginEnd="30dp"
+                android:textStyle="bold"
+                android:buttonTint="@color/white"/>
+        </RadioGroup>
+
+
+    </LinearLayout>
+
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/title_headings"
+        />
+
+
+
+
+    <TextView
+        android:id="@+id/no_data_added_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:text="No Data Added"
+        android:layout_marginTop="10dp"
+        android:layout_centerInParent="true"
+        android:textSize="40sp"
+        android:visibility="invisible"
+        android:textColor="@color/dark_cyan"
+
+        />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/camera_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/skyblue"
+        app:srcCompat="@drawable/camera_shutter"
+        app:tint="@color/white"
+        app:maxImageSize="35dp"
+        android:clickable="true"
+        android:importantForAccessibility="no" />
+
+
+</RelativeLayout>
+
+

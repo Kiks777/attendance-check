@@ -1,0 +1,101 @@
+package com.termproject.ac.database;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
+import com.termproject.ac.AttendanceData;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class AttendanceDbHelper {
+    private final SQLiteDatabase database;
+
+    public AttendanceDbHelper(Context context) {
+        DatabaseHelper dbHelper = new DatabaseHelper(context);
+        database = dbHelper.getWritableDatabase();
+    }
+
+    public void addAttendance(String sectionName, String studentId, String timeIn, String timeOut) {
+        int sectionId = getSectionId(sectionName);
+        if (sectionId == -1) {
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        values.put("section_id", sectionId);
+        values.put("student_id", studentId);
+        values.put("time_in", timeIn);
+        values.put("time_out", timeOut);
+
+        database.insert("Attendance", null, values);
+    }
+
+    public void updateAttendance(String sectionName, String studentId, String timeIn, String timeOut) {
+        int sectionId = getSectionId(sectionName);
+        if (sectionId == -1) {
+            return;
+        }
+
+        ContentValues values = new ContentValues();
+        if (timeIn != null) {
+            values.put("time_in", timeIn);
+        }
+        if (timeOut != null) {
+            values.put("time_out", timeOut);
+        }
+
+        String whereClause = "section_id = ? AND student_id = ?";
+        String[] whereArgs = {String.valueOf(sectionId), studentId};
+
+        database.update("Attendance", values, whereClause, whereArgs);
+    }
+
+    public List<AttendanceData> getAttendanceForSection(String sectionName) {
+        int sectionId = getSectionId(sectionName);
+        if (sectionId == -1) {
+            return null;
+        }
+
+        List<AttendanceData> dataList = new ArrayList<>();
+        String[] columns = {"student_id", "time_in", "time_out"};
+        String selection = "section_id = ?";
+        String[] selectionArgs = {String.valueOf(sectionId)};
+
+        try (Cursor cursor = database.query("Attendance", columns, selection, selectionArgs, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    String studentId = cursor.getString(cursor.getColumnIndexOrThrow("student_id"));
+                    String timeIn = cursor.getString(cursor.getColumnIndexOrThrow("time_in"));
+                    String timeOut = cursor.getString(cursor.getColumnIndexOrThrow("time_out"));
+                    boolean isIn = timeIn != null;
+                    boolean isOut = timeOut != null;
+                    AttendanceData data = new AttendanceData(studentId, isIn, isOut, timeIn, timeOut);
+                    dataList.add(data);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dataList;
+    }
+
+    private int getSectionId(String sectionName) {
+        String[] columns = {"section_id"};
+        String selection = "section_name = ?";
+        String[] selectionArgs = {sectionName};
+
+        try (Cursor cursor = database.query("Sections", columns, selection, selectionArgs, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                return cursor.getInt(cursor.getColumnIndexOrThrow("section_id"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+
+}

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp"
+    android:clickable="true"
+    tools:ignore="HardcodedText" >
+
+
+    <ImageView
+        android:id="@+id/label_background"
+        android:layout_width="340dp"
+        android:layout_height="60dp"
+        android:paddingTop="10dp"
+
+        android:src="@drawable/bg_skyblue"
+        android:scaleType="centerCrop"
+        android:layout_centerInParent="true"
+
+        android:importantForAccessibility="no" />
+
+
+    <TextView
+        android:id="@+id/sectionName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Second Year"
+        android:textSize="25sp"
+        android:layout_centerVertical="true"
+        android:textColor="@color/skyblue"
+        android:layout_marginStart="60dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:singleLine="true"
+        tools:ignore="HardcodedText" />
+
+
+</RelativeLayout>

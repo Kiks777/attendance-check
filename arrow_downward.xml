@@ -1,0 +1,126 @@
+package com.termproject.ac.database;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+import com.termproject.ac.AttendanceData;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class DatabaseHelper extends SQLiteOpenHelper {
+    private static final String DATABASE_NAME = "attendance.db";
+    private static final int DATABASE_VERSION = 1;
+
+    public DatabaseHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String CREATE_EVENTS_TABLE = "CREATE TABLE Events (" +
+                "event_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "event_name TEXT NOT NULL)";
+        db.execSQL(CREATE_EVENTS_TABLE);
+
+        String CREATE_SECTIONS_TABLE = "CREATE TABLE Sections (" +
+                "section_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "section_name TEXT NOT NULL, " +
+                "event_id INTEGER NOT NULL, " +
+                "FOREIGN KEY(event_id) REFERENCES Events(event_id) ON DELETE CASCADE)";
+        db.execSQL(CREATE_SECTIONS_TABLE);
+
+        String CREATE_ATTENDANCE_TABLE = "CREATE TABLE Attendance (" +
+                "attendance_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "section_id INTEGER NOT NULL, " +
+                "student_id TEXT NOT NULL, " +
+                "time_in TEXT, " +
+                "time_out TEXT, " +
+                "FOREIGN KEY(section_id) REFERENCES Sections(section_id) ON DELETE CASCADE)";
+        db.execSQL(CREATE_ATTENDANCE_TABLE);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS Events");
+        db.execSQL("DROP TABLE IF EXISTS Sections");
+        db.execSQL("DROP TABLE IF EXISTS Attendance");
+        onCreate(db);
+    }
+
+    public List<EventSectionData> getEventSectionData() {
+        List<EventSectionData> data = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT e.event_name, s.section_name " +
+                "FROM Events e " +
+                "JOIN Sections s ON e.event_id = s.event_id";
+        Cursor cursor = db.rawQuery(query, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String eventName = cursor.getString(0);
+                String sectionName = cursor.getString(1);
+                data.add(new EventSectionData(eventName, sectionName));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return data;
+    }
+
+
+    public List<AttendanceData> getAttendanceDataForEventAndSection(String eventName, String sectionName) {
+        List<AttendanceData> dataList = new ArrayList<>();
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = this.getReadableDatabase();
+
+            // Query to retrieve attendance data for the specified event and section
+            String query = "SELECT student_id, time_in, time_out FROM Attendance " +
+                    "INNER JOIN Sections ON Attendance.section_id = Sections.section_id " +
+                    "WHERE Sections.section_name = ? AND Sections.event_name = ?";
+            String[] selectionArgs = {sectionName, eventName};
+
+            cursor = db.rawQuery(query, selectionArgs);
+
+            if (cursor != null && cursor.moveToFirst()) {
+                do {
+                    // Retrieve data from the cursor
+                    String idNumber = cursor.getString(cursor.getColumnIndexOrThrow("student_id"));
+                    boolean isIn = cursor.getString(cursor.getColumnIndexOrThrow("time_in")) != null;
+                    boolean isOut = cursor.getString(cursor.getColumnIndexOrThrow("time_out")) != null;
+                    String timeIn = cursor.getString(cursor.getColumnIndexOrThrow("time_in"));
+                    String timeOut = cursor.getString(cursor.getColumnIndexOrThrow("time_out"));
+
+                    // Create AttendanceData object and add to list
+                    AttendanceData data = new AttendanceData(idNumber, isIn, isOut, timeIn, timeOut);
+                    dataList.add(data);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null) {
+                db.close();
+            }
+        }
+
+        return dataList;
+    }
+
+    public static class EventSectionData {
+        public String eventName;
+        public String sectionName;
+
+        public EventSectionData(String eventName, String sectionName) {
+            this.eventName = eventName;
+            this.sectionName = sectionName;
+        }
+    }
+}

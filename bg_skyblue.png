@@ -1,0 +1,42 @@
+
+
+
+package com.termproject.ac;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
+
+public class ItemTableRowAdapter extends RecyclerView.Adapter<ItemTableRowViewHolder> {
+    private final List<AttendanceData> dataList;
+
+    public ItemTableRowAdapter(List<AttendanceData> dataList) {
+        this.dataList = dataList;
+    }
+
+    @NonNull
+    @Override
+    public ItemTableRowViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_table_row, parent, false);
+        return new ItemTableRowViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(ItemTableRowViewHolder holder, int position) {
+        AttendanceData data = dataList.get(position);
+        holder.id.setText(data.getId_number());
+        holder.statusIn.setText(data.isIn() ? "In" : "");
+        holder.currentTimeIn.setText(data.isIn() ? data.getTimeIn() : "");
+        holder.statusOut.setText(data.isOut() ? "Out" : "");
+        holder.currentTimeOut.setText(data.isOut() ? data.getTimeOut() : "");
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return dataList.size();
+    }
+}

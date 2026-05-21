@@ -1,0 +1,17 @@
+package com.termproject.ac;
+
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class SectionItemViewHolder extends RecyclerView.ViewHolder {
+    TextView sectionName;
+
+    public SectionItemViewHolder(@NonNull View itemView) {
+        super(itemView);
+        // Initialize the TextView by finding it by its ID
+        sectionName = itemView.findViewById(R.id.sectionName);
+    }
+}

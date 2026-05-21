@@ -1,0 +1,19 @@
+package com.termproject.ac;
+
+import android.view.View;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+public class EventsListViewHolder extends RecyclerView.ViewHolder {
+    TextView eventName;
+
+
+    public EventsListViewHolder(@NonNull View itemView) {
+        super(itemView);
+        // Initialize the TextViews by finding them by their IDs
+        eventName = itemView.findViewById(R.id.eventName);
+
+    }
+}
